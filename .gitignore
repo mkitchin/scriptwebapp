@@ -1,0 +1,7 @@
+/target/
+/war/
+/www-test/
+/gwt-unitCache/
+/.idea/
+/.gwt/
+/dependency-reduced-pom.xml

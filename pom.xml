@@ -43,6 +43,7 @@
         <dependency.maven-shade-plugin.version>2.3</dependency.maven-shade-plugin.version>
         <dependency.jpy.version>0.7.5</dependency.jpy.version>
         <dependency.abcl.version>1.0.1</dependency.abcl.version>
+        <dependency.beanshell.version>2.0b5</dependency.beanshell.version>
 
         <!-- Note: GWT needs at least java 1.6 -->
         <maven.compiler.source>1.7</maven.compiler.source>
@@ -67,21 +68,6 @@
 
         <!-- 3rd-party -->
         <dependency>
-            <groupId>org.renjin</groupId>
-            <artifactId>renjin-script-engine</artifactId>
-            <version>${dependency.renjin.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.python</groupId>
-            <artifactId>jython-standalone</artifactId>
-            <version>${dependency.jython.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>${dependency.groovy.version}</version>
-        </dependency>
-        <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
             <version>${dependency.commons-fileupload.version}</version>
@@ -91,6 +77,22 @@
             <artifactId>advanced-gwt</artifactId>
             <version>${dependency.advanced-gwt.version}</version>
         </dependency>
+
+        <!-- Jython -->
+        <dependency>
+            <groupId>org.python</groupId>
+            <artifactId>jython-standalone</artifactId>
+            <version>${dependency.jython.version}</version>
+        </dependency>
+
+        <!-- Groovy -->
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>${dependency.groovy.version}</version>
+        </dependency>
+
+        <!-- ABCL -->
         <dependency>
             <groupId>org.armedbear.lisp</groupId>
             <artifactId>abcl-contrib</artifactId>
@@ -102,136 +104,46 @@
             <version>${dependency.abcl.version}</version>
         </dependency>
 
+        <!-- Beanshell -->
+        <dependency>
+            <groupId>org.beanshell</groupId>
+            <artifactId>bsh</artifactId>
+            <version>${dependency.beanshell.version}</version>
+        </dependency>
+
         <!-- JPY -->
+        <!--
         <dependency>
             <groupId>com.opsysinc.lib</groupId>
             <artifactId>jpy</artifactId>
             <version>${dependency.jpy.version}</version>
         </dependency>
+        -->
 
         <!-- Renjin -->
-        <!--
-        <dependency>
-            <groupId>org.renjin.cran</groupId>
-            <artifactId>digest</artifactId>
-            <version>0.6.3-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.renjin.cran</groupId>
-            <artifactId>plyr</artifactId>
-            <version>1.8-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.renjin.cran</groupId>
-            <artifactId>RColorBrewer</artifactId>
-            <version>1.0-5-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.renjin.cran</groupId>
-            <artifactId>reshape2</artifactId>
-            <version>1.2.2-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.renjin.cran</groupId>
-            <artifactId>stringr</artifactId>
-            <version>0.6.2-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.renjin.cran</groupId>
-            <artifactId>zoo</artifactId>
-            <version>1.7-9-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.renjin.cran</groupId>
-            <artifactId>dichromat</artifactId>
-            <version>2.0-0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.renjin.cran</groupId>
-            <artifactId>munsell</artifactId>
-            <version>0.4-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.renjin.cran</groupId>
-            <artifactId>labeling</artifactId>
-            <version>0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.renjin.cran</groupId>
-            <artifactId>mvtnorm</artifactId>
-            <version>0.9-9995-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.renjin.cran</groupId>
-            <artifactId>bitops</artifactId>
-            <version>1.0-5-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.renjin.cran</groupId>
-            <artifactId>e1071</artifactId>
-            <version>1.6-1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.renjin.cran</groupId>
-            <artifactId>gdata</artifactId>
-            <version>2.12.0.2-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.renjin.cran</groupId>
-            <artifactId>lmtest</artifactId>
-            <version>0.9-31-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.renjin.cran</groupId>
-            <artifactId>matrixcalc</artifactId>
-            <version>1.0-3-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.renjin.cran</groupId>
-            <artifactId>quadprog</artifactId>
-            <version>1.5-5-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.renjin.cran</groupId>
-            <artifactId>tseries</artifactId>
-            <version>0.10-32-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.renjin.cran</groupId>
-            <artifactId>evaluate</artifactId>
-            <version>0.4.3-SNAPSHOT</version>
-        </dependency>
         <dependency>
             <groupId>org.renjin</groupId>
-            <artifactId>grid</artifactId>
-            <version>0.7.0-RC7</version>
+            <artifactId>renjin-script-engine</artifactId>
+            <version>${dependency.renjin.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>asm</groupId>
+                    <artifactId>asm</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>asm</groupId>
+                    <artifactId>asm-util</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>asm</groupId>
+                    <artifactId>asm-tree</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>asm</groupId>
+                    <artifactId>asm-commons</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-        <dependency>
-            <groupId>org.renjin.cran</groupId>
-            <artifactId>spatial</artifactId>
-            <version>7.3-5-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.renjin.cran</groupId>
-            <artifactId>igraph</artifactId>
-            <version>0.6.5-2-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.renjin.cran</groupId>
-            <artifactId>reshape</artifactId>
-            <version>0.8.4-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.renjin.cran</groupId>
-            <artifactId>rplotengine</artifactId>
-            <version>1.0-3-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.renjin.cran</groupId>
-            <artifactId>rportfolios</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        -->
 
         <!-- GWT Extras -->
         <dependency>

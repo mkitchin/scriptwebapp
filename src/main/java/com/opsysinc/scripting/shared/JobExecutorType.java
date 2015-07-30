@@ -11,6 +11,7 @@ public enum JobExecutorType {
     python_jython("python", "Python", true),
     javascript_rhino("js", "JavaScript", true),
     groovy_groovy("groovy", "Groovy", true),
+    beanshell_beanshell("beanshell", "BeanShell", true),
     lisp_abcl("lisp", "LISP", true);
 
     /**

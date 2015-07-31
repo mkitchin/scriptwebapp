@@ -1,10 +1,7 @@
 package com.opsysinc.scripting.client.widget;
 
 import com.google.gwt.dom.client.Style;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.FocusEvent;
-import com.google.gwt.event.dom.client.FocusHandler;
+import com.google.gwt.event.dom.client.*;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
@@ -692,6 +689,7 @@ public class ExecutorTab extends AbstractTab {
                 Style.Unit.EM);
         globalVariablesLayoutPanel.addSouth(globalVariablesButtonPanel, 2);
 
+        // Global read button
         final Button globalVariablesSelectButton = new Button("Read",
                 new ClickHandler() {
 
@@ -699,11 +697,24 @@ public class ExecutorTab extends AbstractTab {
                     public void onClick(final ClickEvent arg0) {
 
                         ExecutorTab.this.getScriptWebApp().setLastClickTime(0L);
-                        ExecutorTab.this.runReadVariables(ExecutorTab.VariableScope.engine);
+                        ExecutorTab.this.runReadVariables(ExecutorTab.VariableScope.global);
                     }
                 });
         globalVariablesSelectButton.setWidth("5em");
         globalVariablesButtonPanel.addWest(globalVariablesSelectButton, 6);
+
+        // Global format list
+        final ListBox globalVariablesFormatList = JobWidgetUtils.createDataFormatListBox();
+        globalVariablesFormatList.addChangeHandler(new ChangeHandler() {
+
+            @Override
+            public void onChange(final ChangeEvent changeEvent) {
+
+            }
+        });
+
+        globalVariablesButtonPanel.setWidth("5em");
+        globalVariablesButtonPanel.addWest(globalVariablesFormatList, 6);
 
         this.globalVariablesDataGrid = JobWidgetUtils
                 .createNameValueDataGrid(new ArrayList<Map.Entry<String, String>>(0));
@@ -718,6 +729,7 @@ public class ExecutorTab extends AbstractTab {
                 Style.Unit.EM);
         localVariablesLayoutPanel.addSouth(localVariablesButtonPanel, 2);
 
+        // Local read button
         final Button localVariablesSelectButton = new Button("Read",
                 new ClickHandler() {
 
@@ -730,6 +742,19 @@ public class ExecutorTab extends AbstractTab {
                 });
         localVariablesSelectButton.setWidth("5em");
         localVariablesButtonPanel.addWest(localVariablesSelectButton, 6);
+
+        // Local format list
+        final ListBox localVariablesFormatList = JobWidgetUtils.createDataFormatListBox();
+        localVariablesFormatList.addChangeHandler(new ChangeHandler() {
+
+            @Override
+            public void onChange(final ChangeEvent changeEvent) {
+
+            }
+        });
+
+        localVariablesButtonPanel.setWidth("5em");
+        localVariablesButtonPanel.addWest(localVariablesFormatList, 6);
 
         this.localVariablesDataGrid = JobWidgetUtils
                 .createNameValueDataGrid(new ArrayList<Map.Entry<String, String>>(0));
@@ -832,7 +857,7 @@ public class ExecutorTab extends AbstractTab {
 
         Map<String, String> variables = null;
 
-        if (variableScope.equals(ExecutorTab.VariableScope.engine)) {
+        if (variableScope == ExecutorTab.VariableScope.engine) {
 
             variables = this.localVariables;
 

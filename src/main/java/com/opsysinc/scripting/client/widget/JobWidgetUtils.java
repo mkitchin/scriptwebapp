@@ -6,6 +6,7 @@ import com.google.gwt.dom.client.Style;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.cellview.client.*;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.ProvidesKey;
 import com.google.gwt.view.client.SingleSelectionModel;
@@ -60,6 +61,23 @@ public final class JobWidgetUtils {
         }
 
         return tempText.toString();
+    }
+
+    /**
+     * Build data format list box.
+     *
+     * @return Data format list box.
+     */
+    public static ListBox createDataFormatListBox() {
+
+        final ListBox result = new ListBox();
+
+        for (final JobDataFormat item : JobDataFormat.values()) {
+
+            result.addItem(item.getFormatTitle());
+        }
+
+        return result;
     }
 
     /**

@@ -296,8 +296,8 @@ public class ExecutorTab extends AbstractTab {
                 new LinkedList<JobContentData>());
         this.completedJobs = new ListDataProvider<>(
                 new LinkedList<JobContentData>());
-        this.localVariables = new LinkedHashMap<String, String>();
-        this.globalVariables = new LinkedHashMap<String, String>();
+        this.localVariables = new LinkedHashMap<>();
+        this.globalVariables = new LinkedHashMap<>();
         this.pendingJobModifiedTime = 0L;
         this.completedJobModifiedTime = 0L;
         this.latestPendingJob = null;
@@ -887,7 +887,7 @@ public class ExecutorTab extends AbstractTab {
 
         // global
         this.globalVariablesDataGrid
-                .setRowData(new ArrayList<Map.Entry<String, String>>(
+                .setRowData(new ArrayList<>(
                         this.globalVariables.entrySet()));
         this.globalVariablesDataGrid.setRowCount(this.globalVariables.size());
         ColumnSortEvent.fire(this.globalVariablesDataGrid,
@@ -895,7 +895,7 @@ public class ExecutorTab extends AbstractTab {
 
         // local
         this.localVariablesDataGrid
-                .setRowData(new ArrayList<Map.Entry<String, String>>(
+                .setRowData(new ArrayList<>(
                         this.localVariables.entrySet()));
         this.localVariablesDataGrid.setRowCount(this.localVariables.size());
         ColumnSortEvent.fire(this.localVariablesDataGrid,

@@ -19,8 +19,7 @@ import java.util.TreeMap;
 /**
  * The server-side implementation of the RPC service.
  */
-public class ScriptServiceImpl extends RemoteServiceServlet implements
-        ScriptService {
+public class ScriptServiceImpl extends RemoteServiceServlet implements ScriptService {
 
     /**
      * Default serial version UID.
@@ -160,13 +159,14 @@ public class ScriptServiceImpl extends RemoteServiceServlet implements
     }
 
     @Override
-    public String[][] getExecutorVariables(
-            final JobExecutorData executorData, final int variableScope) {
+    public String[][] getExecutorVariables(final JobExecutorData executorData,
+                                           final int variableScope, final int variableFormat) {
 
         this.checkThreadLocals();
 
-        final Map<String, String> variables = new TreeMap<String, String>();
-        this.jobManager.getExecutorVariables(executorData, variableScope,
+        final Map<String, String> variables = new TreeMap<>();
+        this.jobManager.getExecutorVariables(executorData,
+                variableScope, variableFormat,
                 variables, false);
 
         final String[][] result = new String[variables.size()][2];

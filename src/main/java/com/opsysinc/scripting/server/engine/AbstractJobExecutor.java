@@ -346,7 +346,7 @@ public abstract class AbstractJobExecutor implements JobExecutor {
     }
 
     @Override
-    public boolean getVariables(final int variableScope,
+    public boolean getVariables(final int variableScope, final int variableFormat,
                                 final Map<String, String> target, final boolean isClearFirst) {
 
         JobDataUtils.checkNullObject(target, true);
@@ -356,18 +356,20 @@ public abstract class AbstractJobExecutor implements JobExecutor {
             target.clear();
         }
 
-        return this.getVariablesImpl(variableScope, target);
+        return this.getVariablesImpl(variableScope, variableFormat, target, false);
     }
 
     /**
      * Get variables implementation.
      *
-     * @param variableScope Variable scope.
-     * @param target        Target collection.
+     * @param variableScope  Variable scope.
+     * @param variableFormat Variable format.
+     * @param target         Target collection.
+     * @param isClearFirst   True to clear map before adding, false otherwise.
      * @return True if target was modified, false otherwise.
      */
-    protected abstract boolean getVariablesImpl(final int variableScope,
-                                                final Map<String, String> target);
+    protected abstract boolean getVariablesImpl(final int variableScope, final int variableFormat,
+                                                final Map<String, String> target, final boolean isClearFirst);
 
     /**
      * One-shot init.

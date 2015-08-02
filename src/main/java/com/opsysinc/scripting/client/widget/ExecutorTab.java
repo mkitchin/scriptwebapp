@@ -13,6 +13,7 @@ import com.google.gwt.view.client.ListDataProvider;
 import com.opsysinc.scripting.client.app.ScriptWebApp;
 import com.opsysinc.scripting.client.service.ScriptServiceAsync;
 import com.opsysinc.scripting.shared.JobContentData;
+import com.opsysinc.scripting.shared.JobDataFormat;
 import com.opsysinc.scripting.shared.JobDataUtils;
 import com.opsysinc.scripting.shared.JobExecutorData;
 
@@ -154,6 +155,16 @@ public class ExecutorTab extends AbstractTab {
      * Output text area.
      */
     private TextArea outputTextArea;
+
+    /**
+     * Global data format.
+     */
+    private JobDataFormat globalFormat;
+
+    /**
+     * Local data format.
+     */
+    private JobDataFormat engineFormat;
 
     /**
      * Basic ctor.
@@ -301,6 +312,8 @@ public class ExecutorTab extends AbstractTab {
         this.latestCompletedJob = null;
         this.latestSubmittedJob = null;
         this.latestDisplayedJob = null;
+        this.globalFormat = JobDataFormat.raw;
+        this.engineFormat = JobDataFormat.raw;
     }
 
     /**
@@ -429,14 +442,16 @@ public class ExecutorTab extends AbstractTab {
      * Retrieves variables.
      *
      * @param variableScope Variable scope.
+     * @param dataFormat    Data format.
      */
-    private void runReadVariables(final ExecutorTab.VariableScope variableScope) {
+    private void runReadVariables(final ExecutorTab.VariableScope variableScope,
+                                  JobDataFormat dataFormat) {
 
         JobDataUtils.checkNullObject(variableScope, true);
         ScriptWebApp.showWaitCursor();
 
         this.getScriptService().getExecutorVariables(this.executorData,
-                variableScope.getValue(), new AsyncCallback<String[][]>() {
+                variableScope.getValue(), dataFormat.ordinal(), new AsyncCallback<String[][]>() {
 
                     @Override
                     public void onFailure(final Throwable arg0) {
@@ -697,7 +712,8 @@ public class ExecutorTab extends AbstractTab {
                     public void onClick(final ClickEvent arg0) {
 
                         ExecutorTab.this.getScriptWebApp().setLastClickTime(0L);
-                        ExecutorTab.this.runReadVariables(ExecutorTab.VariableScope.global);
+                        ExecutorTab.this.runReadVariables(ExecutorTab.VariableScope.global,
+                                ExecutorTab.this.globalFormat);
                     }
                 });
         globalVariablesSelectButton.setWidth("5em");
@@ -710,6 +726,7 @@ public class ExecutorTab extends AbstractTab {
             @Override
             public void onChange(final ChangeEvent changeEvent) {
 
+                ExecutorTab.this.globalFormat = JobDataFormat.values()[globalVariablesFormatList.getSelectedIndex()];
             }
         });
 
@@ -737,7 +754,8 @@ public class ExecutorTab extends AbstractTab {
                     public void onClick(final ClickEvent arg0) {
 
                         ExecutorTab.this.getScriptWebApp().setLastClickTime(0L);
-                        ExecutorTab.this.runReadVariables(ExecutorTab.VariableScope.engine);
+                        ExecutorTab.this.runReadVariables(ExecutorTab.VariableScope.engine,
+                                ExecutorTab.this.engineFormat);
                     }
                 });
         localVariablesSelectButton.setWidth("5em");
@@ -750,6 +768,7 @@ public class ExecutorTab extends AbstractTab {
             @Override
             public void onChange(final ChangeEvent changeEvent) {
 
+                ExecutorTab.this.engineFormat = JobDataFormat.values()[localVariablesFormatList.getSelectedIndex()];
             }
         });
 

@@ -478,6 +478,7 @@ public final class JobWidgetUtils {
                         return tempText1.compareTo(tempText2);
                     }
                 });
+
         result.addColumn(nameColumn, "Name");
 
         // value column
@@ -508,6 +509,7 @@ public final class JobWidgetUtils {
         result.addColumn(valueColumn, "Value");
 
         // SETUP
+        result.setColumnWidth(nameColumn, 25, Style.Unit.PCT);
         result.setAutoHeaderRefreshDisabled(true);
         result.setEmptyTableWidget(new Label(
                 JobWidgetUtils.DEFAULT_EMPTY_DATAGRID_TEXT));

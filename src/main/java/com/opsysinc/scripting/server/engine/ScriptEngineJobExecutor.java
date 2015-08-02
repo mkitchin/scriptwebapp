@@ -1,5 +1,7 @@
 package com.opsysinc.scripting.server.engine;
 
+import com.opsysinc.scripting.server.util.FormatUtils;
+import com.opsysinc.scripting.shared.JobDataFormat;
 import com.opsysinc.scripting.shared.JobDataUtils;
 import com.opsysinc.scripting.shared.JobExecutorData;
 
@@ -84,12 +86,19 @@ public class ScriptEngineJobExecutor extends AbstractJobExecutor {
     }
 
     @Override
-    protected boolean getVariablesImpl(final int variableScope,
-                                       final Map<String, String> target) {
+    protected boolean getVariablesImpl(final int variableScope, final int variableFormat,
+                                       final Map<String, String> target, final boolean isClearFirst) {
 
         JobDataUtils.checkNullObject(target, true);
 
+        if (isClearFirst) {
+
+            target.clear();
+        }
+
         final Bindings bindings = this.scriptEngine.getBindings(variableScope);
+        final JobDataFormat dataFormat = JobDataFormat.values()[variableFormat];
+
         boolean result = false;
 
         if (bindings != null) {
@@ -103,7 +112,7 @@ public class ScriptEngineJobExecutor extends AbstractJobExecutor {
 
                 if (!JobDataUtils.checkNullObject(valueObject, false)) {
 
-                    valueText = valueObject.toString().trim();
+                    valueText = FormatUtils.formatObject(valueObject, dataFormat);
                 }
 
                 if (target.put(keyText, valueText) == null) {

@@ -140,14 +140,16 @@ public interface JobManager {
     /**
      * Gets executor variables.
      *
-     * @param executorData  Executor data.
-     * @param variableScope Variable scope.
-     * @param target        Target map.
-     * @param isClearFirst  True to clear target map before populating, false otherwise.
+     * @param executorData   Executor data.
+     * @param variableScope  Variable scope.
+     * @param variableFormat Variable format.
+     * @param target         Target map.
+     * @param isClearFirst   True to clear target map before populating, false otherwise.
      * @return True if target map was altered, false otherwise.
      */
     boolean getExecutorVariables(JobExecutorData executorData,
-                                 int variableScope, Map<String, String> target, boolean isClearFirst);
+                                 int variableScope, int variableFormat,
+                                 Map<String, String> target, boolean isClearFirst);
 
     /**
      * Fetch and clear stored thread output.

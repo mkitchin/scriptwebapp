@@ -439,8 +439,8 @@ public final class BasicJobManager implements JobManager {
 
         LOGGER = Logger.getLogger(BasicJobManager.class.getName());
 
-        final Map<JobExecutorType, BasicJobManager.JobExecutorFactory> executorFactories = new EnumMap<>(
-                JobExecutorType.class);
+        final Map<JobExecutorType, BasicJobManager.JobExecutorFactory> executorFactories =
+                new EnumMap<>(JobExecutorType.class);
         /**
          * TODO - 01/19/15 - MJK - Finish JPY executor some day :P
          *
@@ -740,13 +740,14 @@ public final class BasicJobManager implements JobManager {
 
     @Override
     public boolean getExecutorVariables(final JobExecutorData executorData,
-                                        final int variableScope, final Map<String, String> target,
-                                        final boolean isClearFirst) {
+                                        final int variableScope, final int variableFormat,
+                                        final Map<String, String> target, final boolean isClearFirst) {
 
         final JobExecutor executor = this.getExecutorInstance(executorData);
         JobDataUtils.checkNullObject(executor, true);
 
-        return executor.getVariables(variableScope, target, isClearFirst);
+        return executor.getVariables(variableScope, variableFormat,
+                target, isClearFirst);
     }
 
     /**

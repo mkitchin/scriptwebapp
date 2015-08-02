@@ -31,7 +31,8 @@ public interface ScriptServiceAsync {
     void getExecutorPendingJobs(JobExecutorData executorData, long timeInMS,
                                 AsyncCallback<JobContentData[]> callback);
 
-    void getExecutorVariables(JobExecutorData executorData, int variableScope,
+    void getExecutorVariables(JobExecutorData executorData,
+                              int variableScope, int variableFormat,
                               AsyncCallback<String[][]> callback);
 
     void removeAllExecutors(AsyncCallback<Boolean> callback);

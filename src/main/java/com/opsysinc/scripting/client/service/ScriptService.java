@@ -86,7 +86,7 @@ public interface ScriptService extends RemoteService {
      * @return Variable keys/values.
      */
     String[][] getExecutorVariables(JobExecutorData executorData,
-                                    int variableScope);
+                                    int variableScope, int variableFormat);
 
     /**
      * Remove all executors.
@@ -109,5 +109,5 @@ public interface ScriptService extends RemoteService {
      * @param pendingJob job.
      * @return Job state modified with assigned executor.
      */
-    JobContentData submitJob(JobContentData job);
+    JobContentData submitJob(JobContentData pendingJob);
 }

@@ -92,13 +92,14 @@ public interface JobExecutor {
     /**
      * Gets variables.
      *
-     * @param variableScope Variable scope.
-     * @param target        Target map.
-     * @param isClearFirst  True to clear target map before populating, false otherwise.
+     * @param variableScope  Variable scope.
+     * @param variableFormat Data format.
+     * @param target         Target map.
+     * @param isClearFirst   True to clear target map before populating, false otherwise.
      * @return True if target map was altered, false otherwise.
      */
-    boolean getVariables(int variableScope, Map<String, String> target,
-                         boolean isClearFirst);
+    boolean getVariables(int variableScope, int variableFormat,
+                         Map<String, String> target, boolean isClearFirst);
 
     /**
      * Clear completed jobs.

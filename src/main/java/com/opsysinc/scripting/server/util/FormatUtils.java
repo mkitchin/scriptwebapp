@@ -1,7 +1,6 @@
 package com.opsysinc.scripting.server.util;
 
 import com.opsysinc.scripting.shared.JobDataFormat;
-import com.opsysinc.scripting.shared.JobDataUtils;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.json.JsonHierarchicalStreamDriver;
 import com.thoughtworks.xstream.io.xml.Xpp3Driver;
@@ -19,7 +18,7 @@ import java.util.Map;
 public final class FormatUtils {
 
 
-    private static Map<JobDataFormat, XStream> dataFormats;
+    private static Map<JobDataFormat, XStream> formatXStreams;
 
     static {
 
@@ -28,7 +27,7 @@ public final class FormatUtils {
         tempDataFormats.put(JobDataFormat.xml, new XStream(new Xpp3Driver()));
         tempDataFormats.put(JobDataFormat.json, new XStream(new JsonHierarchicalStreamDriver()));
 
-        FormatUtils.dataFormats = Collections.unmodifiableMap(tempDataFormats);
+        FormatUtils.formatXStreams = Collections.unmodifiableMap(tempDataFormats);
     }
 
     /**
@@ -38,35 +37,44 @@ public final class FormatUtils {
     }
 
     /**
-     * Formats an object as a string, per supplied format.
+     * Get XStream for data format.
      *
-     * @param input      Input Object.
-     * @param dataFormat Input data format.
+     * @param dataFormat Data format.
+     * @return XStream if found, null otherwise.
+     */
+    public static XStream getFormatXStream(final JobDataFormat dataFormat) {
+
+        return FormatUtils.formatXStreams.get(dataFormat);
+    }
+
+    /**
+     * Formats an object as a string, per supplied format. Will be String.valueOf(input)
+     * if (a) input or xstream is null or (b) input is not serializable.
+     *
+     * @param input   Input Object (optional, may be  null; null/!serializable means result=String.valueOf(input)))
+     * @param xstream Input xstream (optional, may be null; null means result=String.valueOf(input))
      * @return String representation of input object.
      */
     public static String formatObject(final Object input,
-                                      final JobDataFormat dataFormat) {
+                                      final XStream xstream) {
 
-        JobDataUtils.checkNullObject(dataFormat, true);
         String result = null;
 
-        if (input != null) {
+        if ((input != null) &&
+                (xstream != null)) {
 
             Class inputClazz = input.getClass();
 
-            if (inputClazz.isArray()) {
+            // catch n-dimensional arrays
+            while (inputClazz.isArray() &&
+                    (inputClazz.getComponentType() != null)) {
 
                 inputClazz = inputClazz.getComponentType();
             }
 
             if (Serializable.class.isAssignableFrom(inputClazz)) {
 
-                final XStream xstream = FormatUtils.dataFormats.get(dataFormat);
-
-                if (xstream != null) {
-
-                    result = xstream.toXML(input);
-                }
+                result = xstream.toXML(input);
             }
         }
 

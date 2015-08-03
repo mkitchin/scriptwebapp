@@ -4,6 +4,7 @@ import com.opsysinc.scripting.server.util.FormatUtils;
 import com.opsysinc.scripting.shared.JobDataFormat;
 import com.opsysinc.scripting.shared.JobDataUtils;
 import com.opsysinc.scripting.shared.JobExecutorData;
+import com.thoughtworks.xstream.XStream;
 
 import javax.script.Bindings;
 import javax.script.ScriptContext;
@@ -91,17 +92,15 @@ public class ScriptEngineJobExecutor extends AbstractJobExecutor {
 
         JobDataUtils.checkNullObject(target, true);
 
-        if (isClearFirst) {
-
-            target.clear();
-        }
-
         final Bindings bindings = this.scriptEngine.getBindings(variableScope);
         final JobDataFormat dataFormat = JobDataFormat.values()[variableFormat];
 
         boolean result = false;
 
-        if (bindings != null) {
+        if ((bindings != null) &&
+                !bindings.isEmpty()) {
+
+            final XStream xstream = FormatUtils.getFormatXStream(dataFormat);
 
             for (final Map.Entry<String, Object> item : bindings.entrySet()) {
 
@@ -112,7 +111,7 @@ public class ScriptEngineJobExecutor extends AbstractJobExecutor {
 
                 if (!JobDataUtils.checkNullObject(valueObject, false)) {
 
-                    valueText = FormatUtils.formatObject(valueObject, dataFormat);
+                    valueText = FormatUtils.formatObject(valueObject, xstream);
                 }
 
                 if (target.put(keyText, valueText) == null) {

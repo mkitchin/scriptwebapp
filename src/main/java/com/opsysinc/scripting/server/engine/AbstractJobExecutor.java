@@ -3,7 +3,10 @@ package com.opsysinc.scripting.server.engine;
 import com.opsysinc.scripting.server.util.ThreadLocalKey;
 import com.opsysinc.scripting.server.util.ThreadLocalMap;
 import com.opsysinc.scripting.shared.*;
+import org.apache.commons.io.FileUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collection;
@@ -47,6 +50,11 @@ public abstract class AbstractJobExecutor implements JobExecutor {
     public static final int DEFAULT_MAX_COMPLETED_JOBS = 20;
 
     /**
+     * Default base directory for files.
+     */
+    public static final File DEFAULT_FILE_BASEDIR;
+
+    /**
      * Logger.
      */
     private static final Logger LOGGER;
@@ -82,9 +90,15 @@ public abstract class AbstractJobExecutor implements JobExecutor {
      */
     private Map<ThreadLocalKey, Object> threadMap;
 
+    /**
+     * File base directory.
+     */
+    private File fileBase;
+
     static {
 
         LOGGER = Logger.getLogger(AbstractJobExecutor.class.getName());
+        DEFAULT_FILE_BASEDIR = new File(FileUtils.getTempDirectoryPath(), "scriptwebapp");
     }
 
     /**
@@ -192,6 +206,7 @@ public abstract class AbstractJobExecutor implements JobExecutor {
             this.worker.join(AbstractJobExecutor.DEFAULT_THREAD_JOIN_WAIT_MS);
 
             this.cleanUpImpl();
+            this.cleanUpFiles();
 
         } catch (final Throwable ex) {
 
@@ -201,6 +216,18 @@ public abstract class AbstractJobExecutor implements JobExecutor {
 
             this.worker = null;
         }
+    }
+
+    /**
+     * Clean up files.
+     *
+     * @throws IOException I/O exception.
+     */
+    private void cleanUpFiles() throws IOException {
+
+        FileUtils.deleteDirectory(this.fileBase);
+        AbstractJobExecutor.LOGGER.log(Level.INFO, "Executor directory removed: " +
+                this.fileBase.getAbsolutePath());
     }
 
     /**
@@ -319,17 +346,60 @@ public abstract class AbstractJobExecutor implements JobExecutor {
     }
 
     @Override
+    public boolean getFilesFromTime(final long lastModifiedTime,
+                                    final String filePath,
+                                    final Collection<JobFileData> target,
+                                    final boolean isClearFirst) {
+
+        JobFileUtils.checkFilePath(filePath);
+        JobDataUtils.checkNullObject(target, true);
+
+        boolean result = false;
+
+        if (isClearFirst) {
+
+            if (result = !target.isEmpty()) {
+
+                target.clear();
+            }
+        }
+
+        final File searchPath = new File(this.fileBase.getAbsolutePath(), filePath);
+
+        for (final File item : FileUtils.listFiles(searchPath, null, false)) {
+
+            if (item.lastModified() > lastModifiedTime) {
+
+                final JobFileData fileData = new JobFileData(this.executorData,
+                        filePath, item.getName(),
+                        (item.isFile() ? JobFileType.file : JobFileType.directory),
+                        (item.isFile() ? item.length() : -1L),
+                        item.lastModified());
+
+                if (target.add(fileData)) {
+
+                    result = true;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
     public boolean getPendingJobsFromTime(final long timeInMS,
                                           final Collection<JobContentData> target, final boolean isClearFirst) {
 
         JobDataUtils.checkNullObject(target, true);
+        boolean result = false;
 
         if (isClearFirst) {
 
-            target.clear();
-        }
+            if (result = !target.isEmpty()) {
 
-        boolean result = false;
+                target.clear();
+            }
+        }
 
         for (final JobContentData item : this.pendingJobs) {
 
@@ -350,13 +420,22 @@ public abstract class AbstractJobExecutor implements JobExecutor {
                                 final Map<String, String> target, final boolean isClearFirst) {
 
         JobDataUtils.checkNullObject(target, true);
+        boolean result = false;
 
         if (isClearFirst) {
 
-            target.clear();
+            if (result = !target.isEmpty()) {
+
+                target.clear();
+            }
         }
 
-        return this.getVariablesImpl(variableScope, variableFormat, target, false);
+        if (this.getVariablesImpl(variableScope, variableFormat, target, false)) {
+
+            result = true;
+        }
+
+        return result;
     }
 
     /**
@@ -618,6 +697,7 @@ public abstract class AbstractJobExecutor implements JobExecutor {
 
         try {
 
+            this.startUpFiles();
             this.startUpImpl();
             this.resetScriptEngine();
 
@@ -632,6 +712,21 @@ public abstract class AbstractJobExecutor implements JobExecutor {
 
             AbstractJobExecutor.LOGGER.log(Level.WARNING, "Can't start up", ex);
         }
+    }
+
+    /**
+     * Start up file area.
+     *
+     * @throws IOException I/O exception.
+     */
+    private void startUpFiles() throws IOException {
+
+        this.fileBase = new File(AbstractJobExecutor.DEFAULT_FILE_BASEDIR,
+                this.getExecutorData().getId());
+        FileUtils.forceMkdir(this.fileBase);
+
+        AbstractJobExecutor.LOGGER.log(Level.INFO, "Executor directory added: " +
+                this.fileBase.getAbsolutePath());
     }
 
     /**

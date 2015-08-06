@@ -2,6 +2,7 @@ package com.opsysinc.scripting.server.engine;
 
 import com.opsysinc.scripting.shared.JobContentData;
 import com.opsysinc.scripting.shared.JobExecutorData;
+import com.opsysinc.scripting.shared.JobFileData;
 
 import java.util.Collection;
 import java.util.Map;
@@ -76,6 +77,18 @@ public interface JobExecutor {
      * @return the jobManager
      */
     JobManager getJobManager();
+
+    /**
+     * Get files modified after a given time.
+     *
+     * @param lastModifiedTime Last modified time (<1 for "all")
+     * @param filePath         Base path
+     * @param target           Target collection.
+     * @param isClearFirst     True to clear target collection before adding, false otherwise.
+     * @return True if target collection was modified, false otherwise.
+     */
+    boolean getFilesFromTime(long lastModifiedTime, String filePath,
+                             Collection<JobFileData> target, boolean isClearFirst);
 
     /**
      * Gets pending jobs from last job id.

@@ -91,11 +91,18 @@ public class ScriptEngineJobExecutor extends AbstractJobExecutor {
                                        final Map<String, String> target, final boolean isClearFirst) {
 
         JobDataUtils.checkNullObject(target, true);
+        boolean result = false;
+
+        if (isClearFirst) {
+
+            if (result = !target.isEmpty()) {
+
+                target.clear();
+            }
+        }
 
         final Bindings bindings = this.scriptEngine.getBindings(variableScope);
         final JobDataFormat dataFormat = JobDataFormat.values()[variableFormat];
-
-        boolean result = false;
 
         if ((bindings != null) &&
                 !bindings.isEmpty()) {

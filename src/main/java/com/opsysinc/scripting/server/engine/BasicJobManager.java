@@ -22,385 +22,6 @@ import java.util.logging.Logger;
 public final class BasicJobManager implements JobManager {
 
     /**
-     * Job executor factory.
-     *
-     * @author mkitchin
-     */
-    private interface JobExecutorFactory {
-
-        /**
-         * Creates job executor (main method).
-         *
-         * @return Job executor.
-         */
-        JobExecutor createJobExecutor(JobManager jobManager,
-                                      JobExecutorData executorData);
-    }
-
-    /**
-     * Holder for printstream/bytearrayoutputstream pair.
-     *
-     * @author mkit
-     */
-    private final class OutputStreamEntry {
-
-        /**
-         * Print stream.
-         */
-        private final PrintStream printStream;
-
-        /**
-         * Output stream.
-         */
-        private final ByteArrayOutputStream outputStream;
-
-        /**
-         * Is enabled?
-         */
-        private boolean isEnabled;
-
-        /**
-         * Basic ctor.
-         */
-        private OutputStreamEntry() {
-
-            this.outputStream = new ByteArrayOutputStream();
-            this.printStream = new PrintStream(this.outputStream, true);
-            this.isEnabled = false;
-        }
-
-        /**
-         * Close everything.
-         */
-        private void close() {
-
-            try {
-
-                this.outputStream.close();
-
-            } catch (final Throwable ignore) {
-
-                // ignore;
-            }
-
-            try {
-
-                this.printStream.close();
-
-            } catch (final Throwable ignore) {
-
-                // ignore;
-            }
-        }
-
-        /**
-         * Gets output stream.
-         *
-         * @return Output stream.
-         */
-        private ByteArrayOutputStream getOutputStream() {
-
-            return this.outputStream;
-        }
-
-        /**
-         * Gets print stream.
-         *
-         * @return Print stream.
-         */
-        private PrintStream getPrintStream() {
-
-            return this.printStream;
-        }
-
-        /**
-         * Gets is enabled?
-         *
-         * @return Is enabled?
-         */
-        private boolean isEnabled() {
-
-            return this.isEnabled;
-        }
-
-        /**
-         * Read/truncate output stream.
-         *
-         * @return Truncated output.
-         */
-        private String readOutput() {
-
-            this.printStream.flush();
-
-            final String result = this.outputStream.toString();
-            this.outputStream.reset();
-
-            return result;
-        }
-
-        /**
-         * Sets is enabled?
-         *
-         * @param isEnabled Is enabled?
-         */
-        private void setEnabled(final boolean isEnabled) {
-
-            this.isEnabled = isEnabled;
-        }
-    }
-
-    /**
-     * Output stream handler.
-     *
-     * @author mkit
-     */
-    private class OutputStreamHandler extends PrintStream {
-
-        /**
-         * Parent stream.
-         */
-        private final PrintStream parentStream;
-
-        /**
-         * Output streams.
-         */
-        private final Map<Thread, BasicJobManager.OutputStreamEntry> outputStreams;
-
-        /**
-         * Basic ctor.
-         *
-         * @param parentStream  Parent stream.
-         * @param outputStreams Output streams map.
-         */
-        public OutputStreamHandler(final PrintStream parentStream,
-                                   final Map<Thread, BasicJobManager.OutputStreamEntry> outputStreams) {
-
-            super(parentStream, true);
-
-            this.parentStream = parentStream;
-            this.outputStreams = outputStreams;
-        }
-
-        @Override
-        public PrintStream append(final char c) {
-
-            return this.getPrintStream().append(c);
-        }
-
-        @Override
-        public PrintStream append(final CharSequence csq) {
-
-            return this.getPrintStream().append(csq);
-        }
-
-        @Override
-        public PrintStream append(final CharSequence csq, final int start,
-                                  final int end) {
-
-            return this.getPrintStream().append(csq, start, end);
-        }
-
-        @Override
-        public boolean checkError() {
-
-            return this.getPrintStream().checkError();
-        }
-
-        @Override
-        public void close() {
-
-            this.getPrintStream().close();
-        }
-
-        @Override
-        public void flush() {
-
-            this.getPrintStream().flush();
-        }
-
-        @Override
-        public PrintStream format(final Locale l, final String format,
-                                  final Object... args) {
-
-            return this.getPrintStream().format(l, format, args);
-        }
-
-        @Override
-        public PrintStream format(final String format, final Object... args) {
-
-            return this.getPrintStream().format(format, args);
-        }
-
-        /**
-         * Gets print stream.
-         *
-         * @return Print stream.
-         */
-        private PrintStream getPrintStream() {
-
-            PrintStream result = this.parentStream;
-            BasicJobManager.OutputStreamEntry outputEntry = null;
-
-            synchronized (this.outputStreams) {
-
-                outputEntry = this.outputStreams.get(Thread.currentThread());
-            }
-
-            if ((outputEntry != null) && outputEntry.isEnabled()) {
-
-                result = outputEntry.getPrintStream();
-            }
-
-            return result;
-        }
-
-        @Override
-        public void print(final boolean b) {
-
-            this.getPrintStream().print(b);
-        }
-
-        @Override
-        public void print(final char c) {
-
-            this.getPrintStream().print(c);
-        }
-
-        @Override
-        public void print(final char[] s) {
-
-            this.getPrintStream().print(s);
-        }
-
-        @Override
-        public void print(final double d) {
-
-            this.getPrintStream().print(d);
-        }
-
-        @Override
-        public void print(final float f) {
-
-            this.getPrintStream().print(f);
-        }
-
-        @Override
-        public void print(final int i) {
-
-            this.getPrintStream().print(i);
-        }
-
-        @Override
-        public void print(final long l) {
-
-            this.getPrintStream().print(l);
-        }
-
-        @Override
-        public void print(final Object obj) {
-
-            this.getPrintStream().print(obj);
-        }
-
-        @Override
-        public void print(final String s) {
-
-            this.getPrintStream().print(s);
-        }
-
-        @Override
-        public PrintStream printf(final Locale l, final String format,
-                                  final Object... args) {
-
-            return this.getPrintStream().printf(l, format, args);
-        }
-
-        @Override
-        public PrintStream printf(final String format, final Object... args) {
-
-            return this.getPrintStream().printf(format, args);
-        }
-
-        @Override
-        public void println() {
-
-            this.getPrintStream().println();
-        }
-
-        @Override
-        public void println(final boolean x) {
-
-            this.getPrintStream().println(x);
-        }
-
-        @Override
-        public void println(final char x) {
-
-            this.getPrintStream().println(x);
-        }
-
-        @Override
-        public void println(final char[] x) {
-
-            this.getPrintStream().println(x);
-        }
-
-        @Override
-        public void println(final double x) {
-
-            this.getPrintStream().println(x);
-        }
-
-        @Override
-        public void println(final float x) {
-
-            this.getPrintStream().println(x);
-        }
-
-        @Override
-        public void println(final int x) {
-
-            this.getPrintStream().println(x);
-        }
-
-        @Override
-        public void println(final long x) {
-
-            this.getPrintStream().println(x);
-        }
-
-        @Override
-        public void println(final Object x) {
-
-            this.getPrintStream().println(x);
-        }
-
-        @Override
-        public void println(final String x) {
-
-            this.getPrintStream().println(x);
-        }
-
-        @Override
-        public void write(final byte[] arg0) throws IOException {
-
-            this.getPrintStream().write(arg0);
-        }
-
-        @Override
-        public void write(final byte[] buf, final int off, final int len) {
-
-            this.getPrintStream().write(buf, off, len);
-        }
-
-        @Override
-        public void write(final int b) {
-
-            this.getPrintStream().write(b);
-        }
-    }
-
-    /**
      * Default job executors.
      */
     public static final int DEFAULT_JOB_EXECUTOR_COUNT = 10;
@@ -859,5 +480,384 @@ public final class BasicJobManager implements JobManager {
         }
 
         return contentData;
+    }
+
+    /**
+     * Job executor factory.
+     *
+     * @author mkitchin
+     */
+    private interface JobExecutorFactory {
+
+        /**
+         * Creates job executor (main method).
+         *
+         * @return Job executor.
+         */
+        JobExecutor createJobExecutor(JobManager jobManager,
+                                      JobExecutorData executorData);
+    }
+
+    /**
+     * Holder for printstream/bytearrayoutputstream pair.
+     *
+     * @author mkit
+     */
+    private final class OutputStreamEntry {
+
+        /**
+         * Print stream.
+         */
+        private final PrintStream printStream;
+
+        /**
+         * Output stream.
+         */
+        private final ByteArrayOutputStream outputStream;
+
+        /**
+         * Is enabled?
+         */
+        private boolean isEnabled;
+
+        /**
+         * Basic ctor.
+         */
+        private OutputStreamEntry() {
+
+            this.outputStream = new ByteArrayOutputStream();
+            this.printStream = new PrintStream(this.outputStream, true);
+            this.isEnabled = false;
+        }
+
+        /**
+         * Close everything.
+         */
+        private void close() {
+
+            try {
+
+                this.outputStream.close();
+
+            } catch (final Throwable ignore) {
+
+                // ignore;
+            }
+
+            try {
+
+                this.printStream.close();
+
+            } catch (final Throwable ignore) {
+
+                // ignore;
+            }
+        }
+
+        /**
+         * Gets output stream.
+         *
+         * @return Output stream.
+         */
+        private ByteArrayOutputStream getOutputStream() {
+
+            return this.outputStream;
+        }
+
+        /**
+         * Gets print stream.
+         *
+         * @return Print stream.
+         */
+        private PrintStream getPrintStream() {
+
+            return this.printStream;
+        }
+
+        /**
+         * Gets is enabled?
+         *
+         * @return Is enabled?
+         */
+        private boolean isEnabled() {
+
+            return this.isEnabled;
+        }
+
+        /**
+         * Read/truncate output stream.
+         *
+         * @return Truncated output.
+         */
+        private String readOutput() {
+
+            this.printStream.flush();
+
+            final String result = this.outputStream.toString();
+            this.outputStream.reset();
+
+            return result;
+        }
+
+        /**
+         * Sets is enabled?
+         *
+         * @param isEnabled Is enabled?
+         */
+        private void setEnabled(final boolean isEnabled) {
+
+            this.isEnabled = isEnabled;
+        }
+    }
+
+    /**
+     * Output stream handler.
+     *
+     * @author mkit
+     */
+    private class OutputStreamHandler extends PrintStream {
+
+        /**
+         * Parent stream.
+         */
+        private final PrintStream parentStream;
+
+        /**
+         * Output streams.
+         */
+        private final Map<Thread, BasicJobManager.OutputStreamEntry> outputStreams;
+
+        /**
+         * Basic ctor.
+         *
+         * @param parentStream  Parent stream.
+         * @param outputStreams Output streams map.
+         */
+        public OutputStreamHandler(final PrintStream parentStream,
+                                   final Map<Thread, BasicJobManager.OutputStreamEntry> outputStreams) {
+
+            super(parentStream, true);
+
+            this.parentStream = parentStream;
+            this.outputStreams = outputStreams;
+        }
+
+        @Override
+        public PrintStream append(final char c) {
+
+            return this.getPrintStream().append(c);
+        }
+
+        @Override
+        public PrintStream append(final CharSequence csq) {
+
+            return this.getPrintStream().append(csq);
+        }
+
+        @Override
+        public PrintStream append(final CharSequence csq, final int start,
+                                  final int end) {
+
+            return this.getPrintStream().append(csq, start, end);
+        }
+
+        @Override
+        public boolean checkError() {
+
+            return this.getPrintStream().checkError();
+        }
+
+        @Override
+        public void close() {
+
+            this.getPrintStream().close();
+        }
+
+        @Override
+        public void flush() {
+
+            this.getPrintStream().flush();
+        }
+
+        @Override
+        public PrintStream format(final Locale l, final String format,
+                                  final Object... args) {
+
+            return this.getPrintStream().format(l, format, args);
+        }
+
+        @Override
+        public PrintStream format(final String format, final Object... args) {
+
+            return this.getPrintStream().format(format, args);
+        }
+
+        /**
+         * Gets print stream.
+         *
+         * @return Print stream.
+         */
+        private PrintStream getPrintStream() {
+
+            PrintStream result = this.parentStream;
+            BasicJobManager.OutputStreamEntry outputEntry = null;
+
+            synchronized (this.outputStreams) {
+
+                outputEntry = this.outputStreams.get(Thread.currentThread());
+            }
+
+            if ((outputEntry != null) && outputEntry.isEnabled()) {
+
+                result = outputEntry.getPrintStream();
+            }
+
+            return result;
+        }
+
+        @Override
+        public void print(final boolean b) {
+
+            this.getPrintStream().print(b);
+        }
+
+        @Override
+        public void print(final char c) {
+
+            this.getPrintStream().print(c);
+        }
+
+        @Override
+        public void print(final char[] s) {
+
+            this.getPrintStream().print(s);
+        }
+
+        @Override
+        public void print(final double d) {
+
+            this.getPrintStream().print(d);
+        }
+
+        @Override
+        public void print(final float f) {
+
+            this.getPrintStream().print(f);
+        }
+
+        @Override
+        public void print(final int i) {
+
+            this.getPrintStream().print(i);
+        }
+
+        @Override
+        public void print(final long l) {
+
+            this.getPrintStream().print(l);
+        }
+
+        @Override
+        public void print(final Object obj) {
+
+            this.getPrintStream().print(obj);
+        }
+
+        @Override
+        public void print(final String s) {
+
+            this.getPrintStream().print(s);
+        }
+
+        @Override
+        public PrintStream printf(final Locale l, final String format,
+                                  final Object... args) {
+
+            return this.getPrintStream().printf(l, format, args);
+        }
+
+        @Override
+        public PrintStream printf(final String format, final Object... args) {
+
+            return this.getPrintStream().printf(format, args);
+        }
+
+        @Override
+        public void println() {
+
+            this.getPrintStream().println();
+        }
+
+        @Override
+        public void println(final boolean x) {
+
+            this.getPrintStream().println(x);
+        }
+
+        @Override
+        public void println(final char x) {
+
+            this.getPrintStream().println(x);
+        }
+
+        @Override
+        public void println(final char[] x) {
+
+            this.getPrintStream().println(x);
+        }
+
+        @Override
+        public void println(final double x) {
+
+            this.getPrintStream().println(x);
+        }
+
+        @Override
+        public void println(final float x) {
+
+            this.getPrintStream().println(x);
+        }
+
+        @Override
+        public void println(final int x) {
+
+            this.getPrintStream().println(x);
+        }
+
+        @Override
+        public void println(final long x) {
+
+            this.getPrintStream().println(x);
+        }
+
+        @Override
+        public void println(final Object x) {
+
+            this.getPrintStream().println(x);
+        }
+
+        @Override
+        public void println(final String x) {
+
+            this.getPrintStream().println(x);
+        }
+
+        @Override
+        public void write(final byte[] arg0) throws IOException {
+
+            this.getPrintStream().write(arg0);
+        }
+
+        @Override
+        public void write(final byte[] buf, final int off, final int len) {
+
+            this.getPrintStream().write(buf, off, len);
+        }
+
+        @Override
+        public void write(final int b) {
+
+            this.getPrintStream().write(b);
+        }
     }
 }

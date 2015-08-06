@@ -10,7 +10,7 @@ import java.util.Arrays;
 public class JobExecutorData extends AbstractJobData {
 
     /**
-     * Default serial verison UID.
+     * Default serial version UID.
      */
     private static final long serialVersionUID = 1L;
 
@@ -53,7 +53,7 @@ public class JobExecutorData extends AbstractJobData {
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(final Object obj) {
+    public synchronized boolean equals(final Object obj) {
 
         JobDataUtils.checkNullObject(obj, true);
 
@@ -102,7 +102,7 @@ public class JobExecutorData extends AbstractJobData {
      * @see java.lang.Object#hashCode()
      */
     @Override
-    public int hashCode() {
+    public synchronized int hashCode() {
 
         return String.valueOf(this.id).hashCode();
     }
@@ -150,7 +150,7 @@ public class JobExecutorData extends AbstractJobData {
      * @see java.lang.Object#toString()
      */
     @Override
-    public String toString() {
+    public synchronized String toString() {
 
         return Arrays.asList(this.getClass().getSimpleName(),
                 String.valueOf(this.id), String.valueOf(this.title),

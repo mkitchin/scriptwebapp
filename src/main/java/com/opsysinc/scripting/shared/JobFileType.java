@@ -7,5 +7,5 @@ package com.opsysinc.scripting.shared;
  */
 public enum JobFileType {
 
-    file, directory, other;
+    file, folder, other;
 }

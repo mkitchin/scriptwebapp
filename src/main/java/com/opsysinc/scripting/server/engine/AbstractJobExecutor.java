@@ -11,6 +11,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -50,7 +51,7 @@ public abstract class AbstractJobExecutor implements JobExecutor {
     public static final int DEFAULT_MAX_COMPLETED_JOBS = 20;
 
     /**
-     * Default base directory for files.
+     * Default base folder for files.
      */
     public static final File DEFAULT_FILE_BASEDIR;
 
@@ -91,7 +92,7 @@ public abstract class AbstractJobExecutor implements JobExecutor {
     private Map<ThreadLocalKey, Object> threadMap;
 
     /**
-     * File base directory.
+     * File base folder.
      */
     private File fileBase;
 
@@ -226,7 +227,7 @@ public abstract class AbstractJobExecutor implements JobExecutor {
     private void cleanUpFiles() throws IOException {
 
         FileUtils.deleteDirectory(this.fileBase);
-        AbstractJobExecutor.LOGGER.log(Level.INFO, "Executor directory removed: " +
+        AbstractJobExecutor.LOGGER.log(Level.INFO, "Executor folder removed: " +
                 this.fileBase.getAbsolutePath());
     }
 
@@ -346,47 +347,6 @@ public abstract class AbstractJobExecutor implements JobExecutor {
     }
 
     @Override
-    public boolean getFilesFromTime(final long lastModifiedTime,
-                                    final String filePath,
-                                    final Collection<JobFileData> target,
-                                    final boolean isClearFirst) {
-
-        JobFileUtils.checkFilePath(filePath);
-        JobDataUtils.checkNullObject(target, true);
-
-        boolean result = false;
-
-        if (isClearFirst) {
-
-            if (result = !target.isEmpty()) {
-
-                target.clear();
-            }
-        }
-
-        final File searchPath = new File(this.fileBase.getAbsolutePath(), filePath);
-
-        for (final File item : FileUtils.listFiles(searchPath, null, false)) {
-
-            if (item.lastModified() > lastModifiedTime) {
-
-                final JobFileData fileData = new JobFileData(this.executorData,
-                        filePath, item.getName(),
-                        (item.isFile() ? JobFileType.file : JobFileType.directory),
-                        (item.isFile() ? item.length() : -1L),
-                        item.lastModified());
-
-                if (target.add(fileData)) {
-
-                    result = true;
-                }
-            }
-        }
-
-        return result;
-    }
-
-    @Override
     public boolean getPendingJobsFromTime(final long timeInMS,
                                           final Collection<JobContentData> target, final boolean isClearFirst) {
 
@@ -449,6 +409,45 @@ public abstract class AbstractJobExecutor implements JobExecutor {
      */
     protected abstract boolean getVariablesImpl(final int variableScope, final int variableFormat,
                                                 final Map<String, String> target, final boolean isClearFirst);
+
+    @Override
+    public boolean getFiles(final String basePath,
+                            final List<JobFileData> target,
+                            final boolean isClearFirst) {
+
+        JobFileUtils.checkBadFilePath(basePath, true);
+        JobDataUtils.checkNullObject(target, true);
+
+        boolean result = false;
+
+        if (isClearFirst) {
+
+            if (result = !target.isEmpty()) {
+
+                target.clear();
+            }
+        }
+
+        final File searchPath = new File(this.fileBase.getAbsolutePath(), basePath);
+
+        for (final File item : FileUtils.listFiles(searchPath, null, false)) {
+
+            final JobFileData fileData = new JobFileData(this.executorData,
+                    basePath, item.getName(),
+                    (item.isFile() ? JobFileType.file : JobFileType.folder),
+                    (item.isFile() ? item.length() : -1L));
+
+            fileData.setCreatedTime(item.lastModified());
+            fileData.setModifiedTime(item.lastModified());
+
+            if (target.add(fileData)) {
+
+                result = true;
+            }
+        }
+
+        return result;
+    }
 
     /**
      * One-shot init.
@@ -725,7 +724,7 @@ public abstract class AbstractJobExecutor implements JobExecutor {
                 this.getExecutorData().getId());
         FileUtils.forceMkdir(this.fileBase);
 
-        AbstractJobExecutor.LOGGER.log(Level.INFO, "Executor directory added: " +
+        AbstractJobExecutor.LOGGER.log(Level.INFO, "Executor folder added: " +
                 this.fileBase.getAbsolutePath());
     }
 

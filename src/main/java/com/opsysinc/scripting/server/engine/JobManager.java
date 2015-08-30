@@ -2,8 +2,10 @@ package com.opsysinc.scripting.server.engine;
 
 import com.opsysinc.scripting.shared.JobContentData;
 import com.opsysinc.scripting.shared.JobExecutorData;
+import com.opsysinc.scripting.shared.JobFileData;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 public interface JobManager {
@@ -150,6 +152,19 @@ public interface JobManager {
     boolean getExecutorVariables(JobExecutorData executorData,
                                  int variableScope, int variableFormat,
                                  Map<String, String> target, boolean isClearFirst);
+
+    /**
+     * Gets executor files.
+     *
+     * @param executorData Executor data.
+     * @param basePath     Base path w/in executor file system.
+     * @param target       Target list.
+     * @param isClearFirst True to clear target list before populating, false otherwise.
+     * @return True if target list was altered, false otherwise.
+     */
+    boolean getExecutorFiles(JobExecutorData executorData,
+                             String basePath,
+                             List<JobFileData> target, boolean isClearFirst);
 
     /**
      * Fetch and clear stored thread output.

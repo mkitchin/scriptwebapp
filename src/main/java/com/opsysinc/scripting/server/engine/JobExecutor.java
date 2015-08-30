@@ -5,6 +5,7 @@ import com.opsysinc.scripting.shared.JobExecutorData;
 import com.opsysinc.scripting.shared.JobFileData;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -79,18 +80,6 @@ public interface JobExecutor {
     JobManager getJobManager();
 
     /**
-     * Get files modified after a given time.
-     *
-     * @param lastModifiedTime Last modified time (<1 for "all")
-     * @param filePath         Base path
-     * @param target           Target collection.
-     * @param isClearFirst     True to clear target collection before adding, false otherwise.
-     * @return True if target collection was modified, false otherwise.
-     */
-    boolean getFilesFromTime(long lastModifiedTime, String filePath,
-                             Collection<JobFileData> target, boolean isClearFirst);
-
-    /**
      * Gets pending jobs from last job id.
      *
      * @param lastJobId    Last job id.
@@ -113,6 +102,17 @@ public interface JobExecutor {
      */
     boolean getVariables(int variableScope, int variableFormat,
                          Map<String, String> target, boolean isClearFirst);
+
+    /**
+     * Gets files.
+     *
+     * @param basePath     Base path w/in file system.
+     * @param target       Target list.
+     * @param isClearFirst True to clear target list before populating, false otherwise.
+     * @return True if target list was altered, false otherwise.
+     */
+    boolean getFiles(String basePath,
+                     List<JobFileData> target, boolean isClearFirst);
 
     /**
      * Clear completed jobs.

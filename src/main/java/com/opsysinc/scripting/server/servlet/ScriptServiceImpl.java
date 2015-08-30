@@ -10,11 +10,9 @@ import com.opsysinc.scripting.server.util.ThreadLocalKey;
 import com.opsysinc.scripting.server.util.ThreadLocalMap;
 import com.opsysinc.scripting.shared.JobContentData;
 import com.opsysinc.scripting.shared.JobExecutorData;
+import com.opsysinc.scripting.shared.JobFileData;
 
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * The server-side implementation of the RPC service.
@@ -181,6 +179,19 @@ public class ScriptServiceImpl extends RemoteServiceServlet implements ScriptSer
         }
 
         return result;
+    }
+
+    @Override
+    public JobFileData[] getExecutorFiles(final JobExecutorData executorData,
+                                          final String basePath) {
+
+        this.checkThreadLocals();
+
+        final List<JobFileData> files = new ArrayList<>();
+        this.jobManager.getExecutorFiles(executorData,
+                basePath, files, false);
+
+        return files.toArray(new JobFileData[files.size()]);
     }
 
     /**

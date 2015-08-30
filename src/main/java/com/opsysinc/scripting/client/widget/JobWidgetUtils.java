@@ -1,15 +1,20 @@
 package com.opsysinc.scripting.client.widget;
 
 import com.google.gwt.cell.client.DateCell;
+import com.google.gwt.cell.client.ImageResourceCell;
+import com.google.gwt.cell.client.NumberCell;
 import com.google.gwt.cell.client.TextCell;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.cellview.client.*;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.ProvidesKey;
 import com.google.gwt.view.client.SingleSelectionModel;
+import com.opsysinc.scripting.client.app.ScriptWebResources;
 import com.opsysinc.scripting.shared.*;
 
 import java.util.Comparator;
@@ -519,6 +524,158 @@ public final class JobWidgetUtils {
     }
 
     /**
+     * Creates job file data grid.
+     *
+     * @param input File data provider.
+     * @return Data grid.
+     */
+    public static DataGrid<JobFileData> createJobFileDataGrid(final ListDataProvider<JobFileData> input) {
+
+        JobDataUtils.checkNullObject(input, true);
+
+        // RESOURCES
+
+        final ScriptWebResources scriptWebResources = GWT.create(ScriptWebResources.class);
+
+        // DATAGRID
+
+        final DataGrid<JobFileData> result = new DataGrid<>(
+                JobWidgetUtils.JOB_FILE_KEY_PROVIDER);
+
+        // BASICS
+
+        // sort handler
+        final ColumnSortEvent.ListHandler<JobFileData> sortHandler = new ColumnSortEvent.ListHandler<>(
+                input.getList());
+        result.addColumnSortHandler(sortHandler);
+
+        // pager
+        final SimplePager pager = new SimplePager(SimplePager.TextLocation.CENTER, false,
+                0, true);
+        pager.setDisplay(result);
+
+        // selection model
+        final SingleSelectionModel<JobFileData> selectionModel = new SingleSelectionModel<>();
+        result.setSelectionModel(selectionModel);
+
+        // COLUMNS
+
+        // icon column
+        final Column<JobFileData, ImageResource> iconColumn = new Column<JobFileData, ImageResource>(new ImageResourceCell()) {
+
+            @Override
+            public ImageResource getValue(final JobFileData jobFileData) {
+
+                ImageResource result = null;
+
+                switch (jobFileData.getType()) {
+
+                    case folder:
+                        result = scriptWebResources.getFolderIconResource();
+                        break;
+
+                    case file:
+                        result = scriptWebResources.getFileIconResource();
+                        break;
+
+                    default:
+                        result = scriptWebResources.getDefaultIconResource();
+                        break;
+                }
+
+                return result;
+            }
+        };
+        iconColumn.setSortable(true);
+        sortHandler.setComparator(iconColumn, new Comparator<JobFileData>() {
+
+            @Override
+            public int compare(final JobFileData o1, final JobFileData o2) {
+                return o1.getType().compareTo(o2.getType());
+            }
+        });
+        iconColumn.setDefaultSortAscending(false);
+
+        result.addColumn(iconColumn, "Type");
+        result.setColumnWidth(iconColumn, 6.0, Style.Unit.EM);
+
+        // name column
+        final Column<JobFileData, String> typeColumn = new Column<JobFileData, String>(
+                new TextCell()) {
+            @Override
+            public String getValue(final JobFileData arg0) {
+                return arg0.getName();
+            }
+        };
+        typeColumn.setSortable(true);
+        sortHandler.setComparator(typeColumn,
+                new Comparator<JobFileData>() {
+
+                    @Override
+                    public int compare(final JobFileData o1,
+                                       final JobFileData o2) {
+                        return o1.getName().compareToIgnoreCase(o2.getName());
+                    }
+                });
+
+        result.addColumn(typeColumn, "Name");
+        result.setColumnWidth(typeColumn, 18.0, Style.Unit.EM);
+
+        // size column
+        final Column<JobFileData, Number> sizeColumn = new Column<JobFileData, Number>(new NumberCell()) {
+            @Override
+            public Long getValue(final JobFileData arg0) {
+                return arg0.getSize();
+            }
+        };
+
+        sizeColumn.setSortable(true);
+        sortHandler.setComparator(sizeColumn, new Comparator<JobFileData>() {
+
+            @Override
+            public int compare(final JobFileData o1, final JobFileData o2) {
+                return Long.compare(o1.getModifiedTime(), o2.getModifiedTime());
+            }
+        });
+        sizeColumn.setDefaultSortAscending(false);
+
+        result.addColumn(sizeColumn, "Size");
+        result.setColumnWidth(sizeColumn, 12.0, Style.Unit.EM);
+
+        // time column
+        final Column<JobFileData, Date> dateColumn = new Column<JobFileData, Date>(
+                new DateCell(
+                        DateTimeFormat
+                                .getFormat(DateTimeFormat.PredefinedFormat.DATE_TIME_MEDIUM))) {
+            @Override
+            public Date getValue(final JobFileData arg0) {
+                return new Date(arg0.getModifiedTime());
+            }
+        };
+        dateColumn.setSortable(true);
+        sortHandler.setComparator(dateColumn, new Comparator<JobFileData>() {
+
+            @Override
+            public int compare(final JobFileData o1, final JobFileData o2) {
+                return Long.compare(o1.getModifiedTime(), o2.getModifiedTime());
+            }
+        });
+        dateColumn.setDefaultSortAscending(false);
+
+        result.addColumn(dateColumn, "Date");
+        result.setColumnWidth(dateColumn, 12.0, Style.Unit.EM);
+
+        // SETUP
+        result.setAutoHeaderRefreshDisabled(true);
+        result.setEmptyTableWidget(new Label(
+                JobWidgetUtils.DEFAULT_EMPTY_DATAGRID_TEXT));
+        result.getColumnSortList().push(dateColumn);
+        input.addDataDisplay(result);
+
+        return result;
+    }
+
+    /**
      * Build cell text.
      *
      * @param input         Input.
@@ -559,6 +716,11 @@ public final class JobWidgetUtils {
      * Job content key provider.
      */
     public static final ProvidesKey<JobExecutorData> JOB_EXECUTOR_KEY_PROVIDER;
+
+    /**
+     * Job content key provider.
+     */
+    public static final ProvidesKey<JobFileData> JOB_FILE_KEY_PROVIDER;
 
     /**
      * Job content key provider.
@@ -608,6 +770,15 @@ public final class JobWidgetUtils {
 
             @Override
             public Object getKey(final JobExecutorData arg0) {
+
+                return arg0.getId();
+            }
+        };
+
+        JOB_FILE_KEY_PROVIDER = new ProvidesKey<JobFileData>() {
+
+            @Override
+            public Object getKey(final JobFileData arg0) {
 
                 return arg0.getId();
             }

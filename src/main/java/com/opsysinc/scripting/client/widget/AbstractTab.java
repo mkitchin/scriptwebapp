@@ -179,7 +179,6 @@ public abstract class AbstractTab {
      * Handle setup error.
      *
      * @param noticeText Notice text.
-     * @param ex         Setup error.
      */
     protected void handleNotice(final String noticeText) {
 

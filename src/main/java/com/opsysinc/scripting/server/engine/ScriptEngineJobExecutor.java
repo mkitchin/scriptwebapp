@@ -4,6 +4,7 @@ import com.opsysinc.scripting.server.util.FormatUtils;
 import com.opsysinc.scripting.shared.JobDataFormat;
 import com.opsysinc.scripting.shared.JobDataUtils;
 import com.opsysinc.scripting.shared.JobExecutorData;
+import com.opsysinc.scripting.shared.JobFileData;
 import com.thoughtworks.xstream.XStream;
 
 import javax.script.Bindings;
@@ -11,6 +12,7 @@ import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**

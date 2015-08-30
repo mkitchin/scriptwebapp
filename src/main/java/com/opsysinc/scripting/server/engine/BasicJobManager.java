@@ -1,10 +1,7 @@
 package com.opsysinc.scripting.server.engine;
 
 import com.opsysinc.scripting.server.object.ExecutorObjectUtils;
-import com.opsysinc.scripting.shared.JobContentData;
-import com.opsysinc.scripting.shared.JobDataUtils;
-import com.opsysinc.scripting.shared.JobExecutorData;
-import com.opsysinc.scripting.shared.JobExecutorType;
+import com.opsysinc.scripting.shared.*;
 import org.python.core.Options;
 
 import java.io.ByteArrayOutputStream;
@@ -369,6 +366,18 @@ public final class BasicJobManager implements JobManager {
 
         return executor.getVariables(variableScope, variableFormat,
                 target, isClearFirst);
+    }
+
+    @Override
+    public boolean getExecutorFiles(final JobExecutorData executorData,
+                                    final String basePath,
+                                    final List<JobFileData> target,
+                                    final boolean isClearFirst) {
+
+        final JobExecutor executor = this.getExecutorInstance(executorData);
+        JobDataUtils.checkNullObject(executor, true);
+
+        return executor.getFiles(basePath, target, isClearFirst);
     }
 
     /**

@@ -26,6 +26,8 @@ import java.util.*;
  */
 public class ExecutorTab extends AbstractTab {
 
+    public static final String JOB_UPDATED_TITLE_SUFFIX = " (*)";
+
     /**
      * Variable scope.
      *
@@ -445,7 +447,7 @@ public class ExecutorTab extends AbstractTab {
      * @param dataFormat    Data format.
      */
     private void runReadVariables(final ExecutorTab.VariableScope variableScope,
-                                  JobDataFormat dataFormat) {
+                                  final JobDataFormat dataFormat) {
 
         JobDataUtils.checkNullObject(variableScope, true);
         ScriptWebApp.showWaitCursor();
@@ -458,7 +460,7 @@ public class ExecutorTab extends AbstractTab {
 
                         ScriptWebApp.showDefaultCursor();
                         ExecutorTab.this.handleError("read " + variableScope
-                                + " variabls", arg0);
+                                + " variables", arg0);
                     }
 
                     @Override
@@ -498,7 +500,10 @@ public class ExecutorTab extends AbstractTab {
 
                 } else {
 
-                    nextTitle += " (*)";
+                    if (!nextTitle.endsWith(ExecutorTab.JOB_UPDATED_TITLE_SUFFIX)) {
+
+                        nextTitle += ExecutorTab.JOB_UPDATED_TITLE_SUFFIX;
+                    }
                 }
             }
         }
@@ -619,16 +624,8 @@ public class ExecutorTab extends AbstractTab {
         });
 
         // FILES
-        // final DockLayoutPanel filesLayoutPanel = new
-        // DockLayoutPanel(Unit.EM);
-        // inputTabPanel.add(filesLayoutPanel, new HTML("Files"));
-        //
-        // final DockLayoutPanel filesButtonPanel = new
-        // DockLayoutPanel(Unit.EM);
-        // filesLayoutPanel.addSouth(filesButtonPanel, 4);
-        //
-        // final Tree filesTree = new Tree();
-        // filesLayoutPanel.add(filesTree);
+        final DockLayoutPanel filesLayoutPanel = new DockLayoutPanel(Style.Unit.EM);
+        inputTabPanel.add(filesLayoutPanel, new HTML("Files"));
 
         // OUTPUT (west, south/remainder)
         final StackLayoutPanel outputStackPanel = new StackLayoutPanel(Style.Unit.EM);

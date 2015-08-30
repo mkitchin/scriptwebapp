@@ -13,6 +13,11 @@ public class JobFileData extends AbstractJobData {
     private static final long serialVersionUID = 1L;
 
     /**
+     * Executor id.
+     */
+    private String id;
+
+    /**
      * Job executor data.
      */
     private JobExecutorData executorData;
@@ -20,27 +25,22 @@ public class JobFileData extends AbstractJobData {
     /**
      * Path.
      */
-    private String filePath;
+    private String path;
 
     /**
      * Name.
      */
-    private String fileName;
+    private String name;
 
     /**
      * File type.
      */
-    private JobFileType fileType;
+    private JobFileType type;
 
     /**
      * File size.
      */
-    private long fileSize;
-
-    /**
-     * Modified date.
-     */
-    private long fileModified;
+    private long size;
 
     /**
      * Basic ctor (GWT needs no-arg).
@@ -53,22 +53,50 @@ public class JobFileData extends AbstractJobData {
      *
      * @param executorData Executor data.
      * @param filePath     Path.
-     * @param fileName     Name.
-     * @param fileType     File type.
+     * @param name         Name.
+     * @param type         File type.
+     * @param size         File size.
      */
     public JobFileData(final JobExecutorData executorData,
                        final String filePath,
-                       final String fileName,
-                       final JobFileType fileType,
-                       final long fileSize,
-                       final long modifiedDate) {
+                       final String name,
+                       final JobFileType type,
+                       final long size) {
 
         this.executorData = executorData;
-        this.filePath = filePath;
-        this.fileName = fileName;
-        this.fileType = fileType;
-        this.fileSize = fileSize;
-        this.fileModified = modifiedDate;
+        this.path = filePath;
+        this.name = name;
+        this.type = type;
+        this.size = size;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public synchronized boolean equals(final Object obj) {
+
+        JobDataUtils.checkNullObject(obj, true);
+
+        if (!(obj instanceof JobFileData)) {
+
+            throw new ClassCastException("invalid input");
+        }
+
+        return String.valueOf(this.id).equals(
+                String.valueOf(((JobFileData) obj).id));
+    }
+
+    /**
+     * Gets id.
+     *
+     * @return Id.
+     */
+    public synchronized String getId() {
+
+        return this.id;
     }
 
     /**
@@ -86,9 +114,9 @@ public class JobFileData extends AbstractJobData {
      *
      * @return File path.
      */
-    public synchronized String getFilePath() {
+    public synchronized String getPath() {
 
-        return this.filePath;
+        return this.path;
     }
 
     /**
@@ -96,9 +124,9 @@ public class JobFileData extends AbstractJobData {
      *
      * @return File name.
      */
-    public synchronized String getFileName() {
+    public synchronized String getName() {
 
-        return this.fileName;
+        return this.name;
     }
 
     /**
@@ -106,9 +134,9 @@ public class JobFileData extends AbstractJobData {
      *
      * @return File type.
      */
-    public synchronized JobFileType getFileType() {
+    public synchronized JobFileType getType() {
 
-        return this.fileType;
+        return this.type;
     }
 
     /**
@@ -116,19 +144,9 @@ public class JobFileData extends AbstractJobData {
      *
      * @return File size.
      */
-    public synchronized long getFileSize() {
+    public synchronized long getSize() {
 
-        return this.fileSize;
-    }
-
-    /**
-     * Gets file modified date.
-     *
-     * @return File modified date.
-     */
-    public synchronized long getFileModifiedDate() {
-
-        return this.fileModified;
+        return this.size;
     }
 
     /**
@@ -141,53 +159,65 @@ public class JobFileData extends AbstractJobData {
         this.executorData = executorData;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public synchronized int hashCode() {
+
+        return String.valueOf(this.id).hashCode();
+    }
+
+    /**
+     * Sets id.
+     *
+     * @param id ID.
+     */
+    public synchronized void setId(final String id) {
+
+        this.id = id;
+        this.setModifiedTime(0L);
+    }
+
     /**
      * Sets file path.
      *
-     * @param filePath File path.
+     * @param path File path.
      */
-    public synchronized void setFilePath(final String filePath) {
+    public synchronized void setPath(final String path) {
 
-        this.filePath = filePath;
+        this.path = path;
     }
 
     /**
      * Sets file name.
      *
-     * @param fileName File name.
+     * @param name File name.
      */
-    public synchronized void setFileName(final String fileName) {
+    public synchronized void setName(final String name) {
 
-        this.fileName = fileName;
+        this.name = name;
     }
 
     /**
      * Sets file type.
      *
-     * @param fileType File type.
+     * @param type File type.
      */
-    public synchronized void setFileType(final JobFileType fileType) {
+    public synchronized void setType(final JobFileType type) {
 
-        this.fileType = fileType;
+        this.type = type;
     }
 
     /**
      * Sets file size.
      *
-     * @param fileSize File size.
+     * @param size File size.
      */
-    public synchronized void setFileSize(final long fileSize) {
+    public synchronized void setSize(final long size) {
 
-        this.fileSize = fileSize;
-    }
-
-    /**
-     * Sets file modified date.
-     *
-     * @param fileModified File modified date.
-     */
-    public synchronized void setFileModifiedDate(final long fileModified) {
-
-        this.fileModified = fileModified;
+        this.size = size;
     }
 }

@@ -4,6 +4,7 @@ import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.opsysinc.scripting.shared.JobContentData;
 import com.opsysinc.scripting.shared.JobExecutorData;
+import com.opsysinc.scripting.shared.JobFileData;
 
 /**
  * The client-side stub for the RPC service.
@@ -87,6 +88,16 @@ public interface ScriptService extends RemoteService {
      */
     String[][] getExecutorVariables(JobExecutorData executorData,
                                     int variableScope, int variableFormat);
+
+    /**
+     * Gets executor files.
+     *
+     * @param executorData Executor data.
+     * @param basePath     Base path w/in executor file system.
+     * @return Variable keys/values.
+     */
+    JobFileData[] getExecutorFiles(JobExecutorData executorData,
+                                   String basePath);
 
     /**
      * Remove all executors.
